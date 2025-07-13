@@ -2,7 +2,7 @@
 require 'pathname'
 
 # Uncomment this block to pass the first stage
-BUILTINS = Set.new(['exit', 'echo', 'type'])
+BUILTINS = Set.new(['exit', 'echo', 'type', 'pwd'])
 
 def consume(iterator)
   [].tap do |ary|
@@ -43,6 +43,10 @@ def type_builtin
   else
     $stdout.write("#{arg}: not found")
   end
+end
+
+def pwd_builtin
+  $stdout.write("#{Dir.pwd}")
 end
 
 def random_command(current_token)
