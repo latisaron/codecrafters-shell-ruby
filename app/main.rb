@@ -1,3 +1,6 @@
+# require 'pry'
+require 'pathname'
+
 # Uncomment this block to pass the first stage
 BUILTINS = Set.new(['exit', 'echo', 'type'])
 
@@ -21,10 +24,18 @@ def echo_builtin
   $stdout.write(consume(@token_iterator).join(' '))
 end
 
+def path_included(command)
+  ENV['PATH'].split(':').find do |path|
+    File.exist?(Pathname.new(path) + command)
+  end
+end
+
 def type_builtin
   arg = @token_iterator.next rescue ''
   if BUILTINS.include?(arg)
     $stdout.write("#{arg} is a shell builtin")
+  elsif path = path_included(arg)
+    $stdout.write("#{arg} is #{path}")
   elsif arg.empty?
     $stdout.write('specify an argument for type builtin')
   else
