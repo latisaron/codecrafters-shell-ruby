@@ -1,4 +1,4 @@
-# require 'pry'
+require 'pry'
 require 'pathname'
 
 # Uncomment this block to pass the first stage
@@ -48,13 +48,17 @@ end
 def random_command(current_token)
   path = path_included(current_token)
   if path
-    system("#{current_token} #{consume(@token_iterator).join(' ')}")
+    # output = `#{current_token} #{consume(@token_iterator).join(' ')}`
+    # $stdout.write(output)
+    system("#{current_token} #{consume(@token_iterator).join(' ')}");
+    @write_newline = false
   else
     $stdout.write("#{current_token}: command not found")
   end
 end
 
 # Wait for user input
+@write_newline = false
 loop do
   $stdout.write("$ ")
   @token_iterator = gets.chomp.enum_for(:split, ' ', -1)
@@ -75,5 +79,6 @@ loop do
       break
     end
   end
-  $stdout.write("\n")
+  $stdout.write("\n") if @write_newline
+  @write_newline = true
 end
