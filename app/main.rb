@@ -33,7 +33,9 @@ def echo_builtin
 end
 
 def type_builtin
+  puts "t1"
   arg = @token_iterator.next rescue ''
+  puts "t2"
   if BUILTINS.include?(arg)
     $stdout.write("#{arg} is a shell builtin")
   elsif path = path_included(arg)
@@ -49,6 +51,16 @@ def pwd_builtin
   $stdout.write("#{Dir.pwd}")
 end
 
+def cd_builtin
+  arg = @token_iterator.next rescue '.'
+  if Dir.exist?(arg)
+    Dir.chdir(arg)
+    @ignore_newline = true
+  else
+    $stdout.write("cd: #{arg}: No such file or directory")
+  end
+end
+
 def random_command(current_token)
   path = path_included(current_token)
   if path
@@ -60,8 +72,8 @@ def random_command(current_token)
 end
 
 # Wait for user input
-@write_newline = false
 loop do
+  @ignore_newline = false
   $stdout.write("$ ")
   @token_iterator = gets.chomp.enum_for(:split, ' ', -1)
   loop do
@@ -75,6 +87,8 @@ loop do
         type_builtin
       elsif current_token == 'pwd'
         pwd_builtin
+      elsif current_token == 'cd'
+        cd_builtin
       else
         random_command(current_token)
         break
@@ -83,5 +97,5 @@ loop do
       break
     end
   end
-  $stdout.write("\n")
+  $stdout.write("\n") unless @ignore_newline
 end
