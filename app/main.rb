@@ -73,6 +73,8 @@ loop do
         echo_builtin
       elsif current_token == 'type'
         type_builtin
+      elsif current_token == 'pwd'
+        pwd_builtin
       else
         random_command(current_token)
         break
