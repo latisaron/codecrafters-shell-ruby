@@ -16,20 +16,20 @@ def consume(iterator)
   end
 end
 
-def exit_builtin
-  exit 0
-end
-
-def echo_builtin
-  $stdout.write(consume(@token_iterator).join(' '))
-end
-
 def path_included(command)
   ENV['PATH'].split(':').each do |path|
     full_path = Pathname.new(path) + command
     return full_path.to_s if File.exist?(full_path) && File.executable?(full_path)
   end
   nil
+end
+
+def exit_builtin
+  exit 0
+end
+
+def echo_builtin
+  $stdout.write(consume(@token_iterator).join(' '))
 end
 
 def type_builtin
@@ -42,6 +42,15 @@ def type_builtin
     $stdout.write('specify an argument for type builtin')
   else
     $stdout.write("#{arg}: not found")
+  end
+end
+
+def random_command(current_token)
+  path = path_included(current_token)
+  if path
+    system("#{path} #{consume(@token_iterator).join(' ')}")
+  else
+    $stdout.write("#{current_token}: command not found")
   end
 end
 
@@ -59,7 +68,7 @@ loop do
       elsif current_token == 'type'
         type_builtin
       else
-        $stdout.write("#{current_token}: command not found")
+        random_command(current_token)
         break
       end
     rescue StopIteration
