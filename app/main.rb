@@ -25,9 +25,11 @@ def echo_builtin
 end
 
 def path_included(command)
-  ENV['PATH'].split(':').find do |path|
-    File.exist?(Pathname.new(path) + command)
+  ENV['PATH'].split(':').each do |path|
+    full_path = Pathname.new(path) + command
+    return full_path.to_s if File.exist?(Pathname.new(path) + command)
   end
+  nil
 end
 
 def type_builtin
