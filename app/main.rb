@@ -27,7 +27,7 @@ end
 def path_included(command)
   ENV['PATH'].split(':').each do |path|
     full_path = Pathname.new(path) + command
-    return full_path.to_s if File.exist?(Pathname.new(path) + command)
+    return full_path.to_s if File.exist?(full_path) && File.executable?(full_path)
   end
   nil
 end
