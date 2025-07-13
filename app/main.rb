@@ -2,4 +2,7 @@
 $stdout.write("$ ")
 
 # Wait for user input
-command, *args = gets.chomp.split(" ")
+loop do
+  tokens = gets.chomp.split(" ")
+  puts "#{tokens[0]}: command not found"
+end
