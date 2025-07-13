@@ -51,6 +51,8 @@ end
 
 def cd_builtin
   arg = @token_iterator.next rescue '.'
+  arg = "#{ENV['HOME']}#{arg[1..]}" if arg[0] == '~'
+  
   if Dir.exist?(arg)
     Dir.chdir(arg)
     @ignore_newline = true
