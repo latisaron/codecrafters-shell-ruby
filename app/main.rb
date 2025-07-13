@@ -49,7 +49,7 @@ def random_command(current_token)
   path = path_included(current_token)
   if path
     output = `#{current_token} #{consume(@token_iterator).join(' ')}`
-    $stdout.write(output)
+    $stdout.write(output.split("\n").join("\n"))
   else
     $stdout.write("#{current_token}: command not found")
   end
