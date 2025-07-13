@@ -1,4 +1,4 @@
-require 'pry'
+# require 'pry'
 require 'pathname'
 
 # Uncomment this block to pass the first stage
