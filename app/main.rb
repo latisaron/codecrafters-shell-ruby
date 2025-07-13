@@ -33,9 +33,7 @@ def echo_builtin
 end
 
 def type_builtin
-  puts "t1"
   arg = @token_iterator.next rescue ''
-  puts "t2"
   if BUILTINS.include?(arg)
     $stdout.write("#{arg} is a shell builtin")
   elsif path = path_included(arg)
