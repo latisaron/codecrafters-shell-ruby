@@ -73,13 +73,17 @@ private
   end
 
   def token_type(token_ary, current_token)
-    if (@current_token[0] == "'" && current_token[-1] == "'" && current_token.size > 1) ||
-        (@current_token[0] == '"' && current_token[-1] == '"' && current_token.size > 1)
+    if (current_token[0] == "'" && current_token[-1] == "'" && current_token.size > 1) ||
+        (current_token[0] == '"' && current_token[-1] == '"' && current_token.size > 1)
       word_or_stringified_command_based_on_string(token_ary)
-    elsif @current_token.empty?
+    elsif current_token.empty?
       Token::EMPTY_STRING
-    elsif @current_token == ' '
+    elsif current_token == ' '
       Token::BLANK_SPACE
+    elsif current_token == '>' || current_token == '1>'
+      Token::STDOUT_REDIRECT
+    elsif current_token == '2>'
+      Token::STDERR_REDIRECT
     else
       word_or_command_based_on_size(token_ary)
     end

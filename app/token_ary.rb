@@ -29,7 +29,10 @@ class TokenAry
       if @list[0].is_a?(TokenAry)
         @list[0].interpret_and_run
       else
+        set_stdout_redirection_if_applicable
+        set_stderr_redirection_if_applicable
         run_based_on_command_token(@list[0])
+        reset_output_redirections
       end
     end
   end
@@ -39,6 +42,30 @@ class TokenAry
   end
 
 private
+
+  def set_stdout_redirection_if_applicable
+    @tmp_stdout = $stdout.dup
+    if index = @list.find_index(&:is_stdout_redirect?)
+      if redirect_target = @list[index+1]
+        $stdout.reopen(redirect_target.value, 'w')
+        bubble_up_ignore_newline
+      end
+    end
+  end
+
+  def set_stderr_redirection_if_applicable
+    @tmp_stderr = $stderr.dup
+    if index = @list.find_index(&:is_stderr_redirect?)
+      if redirect_target = @list[index+1]
+        $stderr.reopen(redirect_target.value, 'w')
+      end
+    end
+  end
+
+  def reset_output_redirections
+    $stdout.reopen @tmp_stdout
+    $stderr.reopen @tmp_stderr
+  end
 
   def bubble_up_ignore_newline(value = true)
     @ignore_newline = true

@@ -17,6 +17,12 @@ class Token
   STRINGIFIED_COMMAND = 5
   public_constant :STRINGIFIED_COMMAND
 
+  STDOUT_REDIRECT = 6
+  public_constant :STDOUT_REDIRECT
+
+  STDERR_REDIRECT = 7
+  public_constant :STDERR_REDIRECT
+
   ALLOWED_TYPES = [
     WORD,
     STRINGIFIED_WORD,
@@ -24,6 +30,8 @@ class Token
     EMPTY_STRING,
     BLANK_SPACE,
     STRINGIFIED_COMMAND,
+    STDOUT_REDIRECT,
+    STDERR_REDIRECT,
   ]
   private_constant :ALLOWED_TYPES
 
@@ -59,5 +67,13 @@ class Token
 
   def is_stringified_command?
     @type == STRINGIFIED_COMMAND
+  end
+
+  def is_stdout_redirect?
+    @type == STDOUT_REDIRECT
+  end
+
+  def is_stderr_redirect?
+    @type == STDERR_REDIRECT
   end
 end
