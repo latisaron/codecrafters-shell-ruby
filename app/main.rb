@@ -1,101 +1,76 @@
 # require 'pry'
 require 'pathname'
+require 'strscan'
 
-# Uncomment this block to pass the first stage
-BUILTINS = Set.new(['exit', 'echo', 'type', 'pwd'])
+require './app/token.rb'
+require './app/token_ary.rb'
 
-def consume(iterator)
-  [].tap do |ary|
-    loop do
-      begin
-        ary << iterator.next
-      rescue StopIteration
-        break
-      end
-    end
+
+def consume_until(character)
+  token = +''
+  loop do
+    current_character = @scanner.getch
+    break if current_character == character || current_character.nil?
+
+    token += current_character
   end
+  return token
 end
 
-def path_included(command)
-  ENV['PATH'].split(':').each do |path|
-    full_path = Pathname.new(path) + command
-    return full_path.to_s if File.exist?(full_path) && File.executable?(full_path)
-  end
-  nil
-end
-
-def exit_builtin
-  exit 0
-end
-
-def echo_builtin
-  $stdout.write(consume(@token_iterator).join(' '))
-end
-
-def type_builtin
-  arg = @token_iterator.next rescue ''
-  if BUILTINS.include?(arg)
-    $stdout.write("#{arg} is a shell builtin")
-  elsif path = path_included(arg)
-    $stdout.write("#{arg} is #{path}")
-  elsif arg.empty?
-    $stdout.write('specify an argument for type builtin')
+def token_type(token_ary, current_token)
+  if @current_token[0] == "'" || @current_token[0] == '"'
+    1
+  elsif @current_token.empty?
+    3
   else
-    $stdout.write("#{arg}: not found")
+    word_or_command_based_on_size(token_ary)
   end
 end
 
-def pwd_builtin
-  $stdout.write("#{Dir.pwd}")
+def add_token_and_reset(token_ary)
+  token_obj = Token.new(
+    @current_token,
+    token_type(token_ary, @current_token)  
+  )
+  token_ary.add(token_obj)
+
+  @current_token = +''
 end
 
-def cd_builtin
-  arg = @token_iterator.next rescue '.'
-  arg = "#{ENV['HOME']}#{arg[1..]}" if arg[0] == '~'
-  
-  if Dir.exist?(arg)
-    Dir.chdir(arg)
-    @ignore_newline = true
-  else
-    $stdout.write("cd: #{arg}: No such file or directory")
-  end
-end
-
-def random_command(current_token)
-  path = path_included(current_token)
-  if path
-    output = `#{current_token} #{consume(@token_iterator).join(' ')}`.rstrip
-    $stdout.write(output)
-  else
-    $stdout.write("#{current_token}: command not found")
-  end
+def word_or_command_based_on_size(token_ary)
+  token_ary.size.zero? ? 2 : 0
 end
 
 # Wait for user input
 loop do
-  @ignore_newline = false
   $stdout.write("$ ")
-  @token_iterator = gets.chomp.enum_for(:split, ' ', -1)
+  @ignore_newline = false
+  @scanner = StringScanner.new(gets.chomp)
+
+  main_tokens_ary = TokenAry.new
+  work_tokens_ary = TokenAry.new
+  main_tokens_ary.add(work_tokens_ary)
+
+  @current_token = +''
   loop do
-    current_token = @token_iterator.next()
-    begin
-      if current_token == 'exit'
-        exit_builtin
-      elsif current_token == 'echo'
-        echo_builtin
-      elsif current_token == 'type'
-        type_builtin
-      elsif current_token == 'pwd'
-        pwd_builtin
-      elsif current_token == 'cd'
-        cd_builtin
-      else
-        random_command(current_token)
-        break
-      end
-    rescue StopIteration
+    current_character = @scanner.getch
+    if current_character.nil?
+      add_token_and_reset(work_tokens_ary)
       break
+    elsif current_character == "'"
+      @current_token = "'#{consume_until("'")}'"
+      add_token_and_reset(work_tokens_ary)
+    elsif current_character == '"'
+      @current_token = '"' + consume_until('"') + '"'
+      add_token_and_reset(work_tokens_ary)
+    elsif current_character == ' '
+      add_token_and_reset(work_tokens_ary)
+    else
+      @current_token += current_character
     end
   end
-  $stdout.write("\n") unless @ignore_newline
+
+  main_tokens_ary.interpret_and_run
+
+  $stdout.write("\n") unless main_tokens_ary.ignore_newline
 end
