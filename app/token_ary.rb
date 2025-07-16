@@ -60,6 +60,7 @@ private
     if index = @list.find_index(&:is_stderr_redirect?)
       if redirect_target = @list[index+1]
         $stderr.reopen(redirect_target.value, 'w')
+        bubble_up_ignore_newline
         @list.delete_at(index+1)
         @list.delete_at(index)
       end
