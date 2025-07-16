@@ -146,7 +146,13 @@ private
   end
 
   def random_command(token_obj)
-    current_token = token_obj.value
+    current_token =
+      if token_obj.is_stringified_command?
+        token_obj.value[1..-2]
+      else
+        token_value
+      end
+
     path = path_included(current_token)
     if path
       output = `#{current_token} #{@list[1..].map(&:value).join(' ')}`.rstrip

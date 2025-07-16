@@ -14,12 +14,16 @@ class Token
   BLANK_SPACE = 4
   public_constant :BLANK_SPACE
 
+  STRINGIFIED_COMMAND = 5
+  public_constant :STRINGIFIED_COMMAND
+
   ALLOWED_TYPES = [
-    WORD, # word
-    STRINGIFIED_WORD, # stringified word
-    COMMAND, # command
-    EMPTY_STRING, # EMPTY_STRING
+    WORD,
+    STRINGIFIED_WORD,
+    COMMAND,
+    EMPTY_STRING,
     BLANK_SPACE,
+    STRINGIFIED_COMMAND,
   ]
   private_constant :ALLOWED_TYPES
 
@@ -51,5 +55,9 @@ class Token
 
   def is_blank_space?
     @type == BLANK_SPACE
+  end
+
+  def is_stringified_command?
+    @type == STRINGIFIED_COMMAND
   end
 end
