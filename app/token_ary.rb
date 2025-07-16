@@ -40,7 +40,8 @@ class TokenAry
 
 private
 
-  def bubble_up_ignore_newline
+  def bubble_up_ignore_newline(value = true)
+    @ignore_newline = true
     parent.instance_variable_set(:@ignore_newline, @ignore_newline)
   end
 
@@ -116,10 +117,9 @@ private
       else
         $stdout.write("#{arg}: not found")
       end
-      self.bubble_up_ignore_newline
-      @ignore_newline = true
-      $stdout.write("\n")
+      $stdout.write("\n") 
     end
+    bubble_up_ignore_newline
   end
 
   def pwd_builtin
@@ -132,8 +132,7 @@ private
     
     if Dir.exist?(arg)
       Dir.chdir(arg)
-      @ignore_newline = true
-      self.bubble_up_ignore_newline
+      bubble_up_ignore_newline
     else
       $stdout.write("cd: #{arg}: No such file or directory")
     end
