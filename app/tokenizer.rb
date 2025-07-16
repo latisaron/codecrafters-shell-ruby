@@ -70,7 +70,8 @@ private
   end
 
   def token_type(token_ary, current_token)
-    if @current_token[0] == "'" || @current_token[0] == '"'
+    if (@current_token[0] == "'" && current_token[-1] == "'" && current_token.size > 1) ||
+        (@current_token[0] == '"' && current_token[-1] == '"' && current_token.size > 1)
       Token::STRINGIFIED_WORD
     elsif @current_token.empty?
       Token::EMPTY_STRING
