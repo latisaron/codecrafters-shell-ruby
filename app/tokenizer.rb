@@ -75,7 +75,7 @@ private
   def token_type(token_ary, current_token)
     if (@current_token[0] == "'" && current_token[-1] == "'" && current_token.size > 1) ||
         (@current_token[0] == '"' && current_token[-1] == '"' && current_token.size > 1)
-      word_or_command_based_on_size(token_ary)
+      word_or_stringified_command_based_on_string(token_ary)
     elsif @current_token.empty?
       Token::EMPTY_STRING
     elsif @current_token == ' '

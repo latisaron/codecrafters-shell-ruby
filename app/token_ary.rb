@@ -146,15 +146,16 @@ private
   end
 
   def random_command(token_obj)
-    current_token =
+    token_without_quotes = 
       if token_obj.is_stringified_command?
         token_obj.value[1..-2]
       else
         token_obj.value
       end
 
-    path = path_included(current_token)
-    if path
+    current_token = token_obj.value
+
+    if path_included(token_without_quotes)
       output = `#{current_token} #{@list[1..].map(&:value).join(' ')}`.rstrip
       $stdout.write(output)
     else
