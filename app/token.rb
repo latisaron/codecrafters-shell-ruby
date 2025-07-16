@@ -14,12 +14,7 @@ class Token
     raise(StandardError, 'Unknown token type') unless ALLOWED_TYPES.include?(type)
 
     @type = type
-    @value =
-      if is_stringified?
-        value[1..-2]
-      else
-        value
-      end
+    @value = value
   end
 
   def is_stringified?

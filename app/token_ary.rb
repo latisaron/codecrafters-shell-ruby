@@ -78,22 +78,28 @@ private
     previous_type = nil
     previous_value = nil
     @list[1..].each do |item|
+      item_value =
+        if item.type == 1
+          item.value[1..-2]
+        else
+          item.value
+        end
       new_string +=
         if previous_type.nil?
-          item.value
+          item_value
         elsif item.type == 1 && previous_type == 1
-          item.value
+          item_value
         elsif previous_type == 1 && previous_value.empty?
-          item.value
+          item_value
         elsif item.type == 3
           ''
-        elsif item.type == 1 && item.value.empty?
+        elsif item.type == 1 && item_value.empty?
           ''
         else
-          " #{item.value}"
+          " #{item_value}"
         end
       previous_type = item.type
-      previous_value = item.value
+      previous_value = item_value
     end
     $stdout.write(new_string)
   end
