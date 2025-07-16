@@ -150,7 +150,7 @@ private
       if token_obj.is_stringified_command?
         token_obj.value[1..-2]
       else
-        token_value
+        token_obj.value
       end
 
     path = path_included(current_token)
