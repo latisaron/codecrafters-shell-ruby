@@ -44,11 +44,10 @@ end
 # Wait for user input
 loop do
   $stdout.write("$ ")
-  @ignore_newline = false
   @scanner = StringScanner.new(gets.chomp)
 
   main_tokens_ary = TokenAry.new
-  work_tokens_ary = TokenAry.new
+  work_tokens_ary = TokenAry.new(parent: main_tokens_ary)
   main_tokens_ary.add(work_tokens_ary)
 
   @current_token = +''
@@ -58,9 +57,13 @@ loop do
       add_token_and_reset(work_tokens_ary)
       break
     elsif current_character == "'"
+      add_token_and_reset(work_tokens_ary) unless @current_token.empty?
+
       @current_token = "'#{consume_until("'")}'"
       add_token_and_reset(work_tokens_ary)
     elsif current_character == '"'
+      add_token_and_reset(work_tokens_ary) unless @current_token.empty?
+
       @current_token = '"' + consume_until('"') + '"'
       add_token_and_reset(work_tokens_ary)
     elsif current_character == ' '

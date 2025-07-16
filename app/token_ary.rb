@@ -7,8 +7,9 @@ class TokenAry
   attr_reader :list
   attr_reader :ignore_newline
 
-  def initialize
+  def initialize(parent: nil)
     @list = []
+    @parent = parent
   end
 
   def add(token)
@@ -32,8 +33,16 @@ class TokenAry
       end
     end
   end
+  
+  def parent
+    @parent&.parent || @parent
+  end
 
 private
+
+  def bubble_up_ignore_newline
+    parent.instance_variable_set(:@ignore_newline, @ignore_newline)
+  end
 
   def run_based_on_command_token(command_token)
     case command_token.value
@@ -67,18 +76,24 @@ private
   def echo_builtin
     new_string = +''
     previous_type = nil
+    previous_value = nil
     @list[1..].each do |item|
       new_string +=
         if previous_type.nil?
           item.value
         elsif item.type == 1 && previous_type == 1
           item.value
+        elsif previous_type == 1 && previous_value.empty?
+          item.value
         elsif item.type == 3
+          ''
+        elsif item.type == 1 && item.value.empty?
           ''
         else
           " #{item.value}"
         end
       previous_type = item.type
+      previous_value = item.value
     end
     $stdout.write(new_string)
   end
@@ -95,6 +110,7 @@ private
       else
         $stdout.write("#{arg}: not found")
       end
+      self.bubble_up_ignore_newline
       @ignore_newline = true
       $stdout.write("\n")
     end
@@ -111,6 +127,7 @@ private
     if Dir.exist?(arg)
       Dir.chdir(arg)
       @ignore_newline = true
+      self.bubble_up_ignore_newline
     else
       $stdout.write("cd: #{arg}: No such file or directory")
     end
