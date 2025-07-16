@@ -74,28 +74,33 @@ private
     exit 0
   end
 
+  def token_value(item)
+    if item.is_stringified?
+      item.value[1..-2]  
+    else
+      item.value
+    end
+  end
+
   def echo_builtin
     new_string = +''
     previous_type = nil
     previous_value = nil
     @list[1..].each do |item|
-      item_value =
-        if item.type == 1
-          item.value[1..-2]
-        else
-          item.value
-        end
+      item_value = token_value(item)
       new_string +=
         if previous_type.nil?
           item_value
-        elsif item.type == 1 && previous_type == 1
+        elsif item.is_stringified? && previous_type == Token::STRINGIFIED_WORD
           item_value
-        elsif previous_type == 1 && previous_value.empty?
+        elsif previous_type == Token::STRINGIFIED_WORD && previous_value.empty?
           item_value
-        elsif item.type == 3
+        elsif item.is_empty?
           ''
-        elsif item.type == 1 && item_value.empty?
+        elsif item.is_stringified? && item_value.empty?
           ''
+        elsif item.is_blank_space?
+          ' '
         else
           " #{item_value}"
         end
