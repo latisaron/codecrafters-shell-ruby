@@ -1,3 +1,4 @@
+# require 'pry'
 require './app/token.rb'
 
 class Tokenizer
@@ -57,6 +58,8 @@ private
         next_character = @scanner.getch
         if next_character == character
           token += character
+        elsif next_character == '\\'
+          token += '\\'
         else
           token += current_character + next_character
         end
