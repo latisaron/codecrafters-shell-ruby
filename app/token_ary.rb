@@ -95,6 +95,8 @@ private
           item_value
         elsif previous_type == Token::STRINGIFIED_WORD && previous_value.empty?
           item_value
+        elsif previous_type == Token::BLANK_SPACE
+          item_value
         elsif item.is_empty?
           ''
         elsif item.is_stringified? && item_value.empty?
