@@ -1,4 +1,4 @@
-require 'pry'
+# require 'pry'
 
 class TokenAry
   BUILTINS = Set.new(['exit', 'echo', 'type', 'pwd'])
