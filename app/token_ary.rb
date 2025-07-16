@@ -91,7 +91,7 @@ private
       new_string +=
         if previous_type.nil?
           item_value
-        elsif item.is_stringified? && previous_type == Token::STRINGIFIED_WORD
+        elsif previous_type == Token::STRINGIFIED_WORD
           item_value
         elsif previous_type == Token::STRINGIFIED_WORD && previous_value.empty?
           item_value
