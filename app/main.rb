@@ -5,6 +5,8 @@ require 'strscan'
 require './app/token.rb'
 require './app/token_ary.rb'
 require './app/tokenizer.rb'
+require './app/realtime_tokenizer.rb'
+require './app/trie.rb'
 
 def ensure_space_at_final(string)
   if string[-1] != "\n" && !string.empty?
@@ -41,11 +43,12 @@ end
 loop do
   $stdout.write("$ ")
 
-  user_input = gets.chomp
-
-  tokenizer = Tokenizer.new(user_input)
-  main_tokens_ary = tokenizer.tokenize
+  tokenizer = RealtimeTokenizer.new
+  main_tokens_ary = tokenizer.intrepret_user_input_in_real_time
+  
 
   results_list = main_tokens_ary.interpret_and_run
+
   output_results_list(results_list)
 end
+

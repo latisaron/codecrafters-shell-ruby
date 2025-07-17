@@ -1,6 +1,6 @@
-require 'pry'
+  require 'pry'
 class TrieNode
-  AUTOCOMPLETION_LIMIT = 3
+  AUTOCOMPLETION_LIMIT = 1
   private_constant :AUTOCOMPLETION_LIMIT
 
   attr_reader :tree
@@ -53,7 +53,7 @@ class AutocompletionTrie
   end
 
   def autocomplete(value)
-    return '' if value.empty?
+    return [''] if value.empty? || value.nil?
 
     current_character_iter = value.enum_for(:chars)
     trie_node = @root
@@ -67,7 +67,6 @@ class AutocompletionTrie
     end
 
     trie_node.autocomplete_from_self
-    
   end
 
 private

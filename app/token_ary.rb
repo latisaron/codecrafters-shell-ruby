@@ -2,7 +2,7 @@
 
 class TokenAry
   BUILTINS = Set.new(['exit', 'echo', 'type', 'pwd'])
-  private_constant :BUILTINS
+  public_constant :BUILTINS
 
   attr_reader :list
   attr_reader :ignore_newline
