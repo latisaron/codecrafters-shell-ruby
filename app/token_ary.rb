@@ -204,6 +204,9 @@ private
 
         stdout_str, stderr_str, status = Open3.capture3(execution_string)
 
+        puts "stdout is #{stdout_str}"
+        puts "stdeerr is #{stderr_str}"
+
         if status.success?
           result_for(stdout_str, 0)
         else
