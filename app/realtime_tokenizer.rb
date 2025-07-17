@@ -13,7 +13,9 @@ class RealtimeTokenizer
     @input = +'$ '
     @current_token = +''
     work_tokens_ary = @work_tokens_ary
-    STDIN.raw do
+    STDIN.echo = false
+    STDIN.raw!
+
       loop do
         current_character = STDIN.getc
         
@@ -77,8 +79,11 @@ class RealtimeTokenizer
         end
       end
       $stdout.flush
-    end
-    @main_tokens_ary
+
+      return @main_tokens_ary
+  ensure
+    STDIN.echo = true
+    STDIN.cooked!
   end
 
 private
