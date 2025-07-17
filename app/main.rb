@@ -4,7 +4,6 @@ require 'strscan'
 
 require './app/token.rb'
 require './app/token_ary.rb'
-require './app/tokenizer.rb'
 require './app/realtime_tokenizer.rb'
 require './app/trie.rb'
 
@@ -45,7 +44,7 @@ loop do
 
   tokenizer = RealtimeTokenizer.new
   main_tokens_ary = tokenizer.intrepret_user_input_in_real_time
-  
+
 
   results_list = main_tokens_ary.interpret_and_run
 
