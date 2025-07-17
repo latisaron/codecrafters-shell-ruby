@@ -76,10 +76,8 @@ class RealtimeTokenizer
           @current_token += current_character
         end
       end
+      $stdout.flush
     end
-
-    $stdout.flush
-
     @main_tokens_ary
   end
 
