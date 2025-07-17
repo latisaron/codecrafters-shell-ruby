@@ -26,6 +26,7 @@ def output_results_list(results_list)
       $stderr.reopen(item[3][0], item[3][1]) unless item[3].nil?
 
       # binding.pry
+      puts "item is #{item.inspect} \n"
       if item[1] == 0
         $stdout
       else
