@@ -23,18 +23,17 @@ class TokenAry
   def interpret_and_run
     has_chained_commands = @list.count { |element| element.is_a?(TokenAry)} > 1
 
+    results = []
     if has_chained_commands
       run_chained_commands_mumbojumbo
     else
       if @list[0].is_a?(TokenAry)
-        @list[0].interpret_and_run
+        results += @list[0].interpret_and_run
       else
-        set_stdout_redirection_if_applicable
-        set_stderr_redirection_if_applicable
-        run_based_on_command_token(@list[0])
-        reset_output_redirections
+        results += run_based_on_command_token(@list[0])
       end
     end
+    results
   end
   
   def parent
@@ -44,11 +43,9 @@ class TokenAry
 private
 
   def set_stdout_redirection_if_applicable
-    @tmp_stdout = $stdout.dup
     if index = @list.find_index(&:is_stdout_redirect?)
       if redirect_target = @list[index+1]
-        $stdout.reopen(redirect_target.value, 'w')
-        bubble_up_ignore_newline
+        @tmp_stdout = redirect_target.value
         @list.delete_at(index+1)
         @list.delete_at(index)
       end
@@ -56,28 +53,19 @@ private
   end
 
   def set_stderr_redirection_if_applicable
-    @tmp_stderr = $stderr.dup
     if index = @list.find_index(&:is_stderr_redirect?)
       if redirect_target = @list[index+1]
-        $stderr.reopen(redirect_target.value, 'w')
-        bubble_up_ignore_newline
+        @tmp_stderr = redirect_target.value
         @list.delete_at(index+1)
         @list.delete_at(index)
       end
     end
   end
 
-  def reset_output_redirections
-    $stdout.reopen @tmp_stdout
-    $stderr.reopen @tmp_stderr
-  end
-
-  def bubble_up_ignore_newline(value = true)
-    @ignore_newline = true
-    parent.instance_variable_set(:@ignore_newline, @ignore_newline)
-  end
-
   def run_based_on_command_token(command_token)
+    set_stdout_redirection_if_applicable
+    set_stderr_redirection_if_applicable
+
     case command_token.value
     when 'exit'
       exit_builtin
@@ -141,40 +129,40 @@ private
       previous_type = item.type
       previous_value = item_value
     end
-    $stdout.write(new_string)
+    [result_for("#{new_string}\n", 0)]
   end
 
   def type_builtin
-    @list[1..].each do |token|
+    @list[1..].map do |token|
       arg = token.value
       if BUILTINS.include?(arg)
-        $stdout.write("#{arg} is a shell builtin")
+        result_for("#{arg} is a shell builtin\n", 0)
       elsif path = path_included(arg)
-        $stdout.write("#{arg} is #{path}")
+        result_for("#{arg} is #{path}\n", 0)
       elsif arg.empty?
-        $stdout.write('specify an argument for type builtin')
+        result_for('specify an argument for type builtin\n', 2)
       else
-        $stdout.write("#{arg}: not found")
+        result_for("#{arg}: not found\n", 2)
       end
-      $stdout.write("\n") 
     end
-    bubble_up_ignore_newline
   end
 
   def pwd_builtin
-    $stdout.write("#{Dir.pwd}")
+    [result_for("#{Dir.pwd}\n", 0)]
   end
 
   def cd_builtin
     arg = @list[1].value || '.'
     arg = "#{ENV['HOME']}#{arg[1..]}" if arg[0] == '~'
     
-    if Dir.exist?(arg)
-      Dir.chdir(arg)
-      bubble_up_ignore_newline
-    else
-      $stdout.write("cd: #{arg}: No such file or directory")
-    end
+    result =
+      if Dir.exist?(arg)
+        Dir.chdir(arg)
+        result_for('', 0)
+      else
+        result_for("cd: #{arg}: No such file or directory\n", 2)
+      end
+    [result]
   end
 
   def random_command(token_obj)
@@ -187,11 +175,25 @@ private
 
     current_token = token_obj.value
 
-    if path_included(token_without_quotes)
-      output = `#{current_token} #{@list[1..].map(&:value).join(' ')}`.rstrip
-      $stdout.write(output)
-    else
-      $stdout.write("#{current_token}: command not found")
-    end
+    result =
+      if path_included(token_without_quotes)
+        # binding.pry
+        execution_string = "#{current_token} #{@list[1..].map(&:value).join(' ')}"
+        execution_string += " 1> #{@tmp_stdout}" if @tmp_stdout
+        execution_string += " 2> #{@tmp_stderr}" if @tmp_stderr
+        
+        output = `#{execution_string}`
+
+        @tmp_stdout = @tmp_stderr = nil
+
+        result_for(output, 0)
+      else
+        result_for("#{current_token}: command not found\n", 2)
+      end
+    [result]
+  end
+
+  def result_for(output, status)
+    [output, status, @tmp_stdout.dup, @tmp_stderr.dup]
   end
 end
