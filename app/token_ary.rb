@@ -1,4 +1,5 @@
 # require 'pry'
+require 'open3'
 
 class TokenAry
   BUILTINS = Set.new(['exit', 'echo', 'type', 'pwd'])
@@ -200,34 +201,14 @@ private
     result =
       if path_included(token_without_quotes)
         execution_string = "#{current_token} #{@list[1..].map(&:value).join(' ')}"
-        
-        execution_string +=
-          if @tmp_stdout
-            if @tmp_stdout[1] == 'w'
-              " 1> #{@tmp_stdout[0]}"
-            else
-              " 1>> #{@tmp_stdout[0]}"
-            end
-          else
-            ''
-          end
 
-        execution_string +=
-          if @tmp_stderr
-            if @tmp_stderr[1] == 'w'
-              " 2> #{@tmp_stderr[0]}"
-            else
-              " 2>> #{@tmp_stderr[0]}"
-            end
-          else
-            ''
-          end
-        
-        output = `#{execution_string}`
+        stdout_str, stderr_str, status = Open3.capture3(execution_string)
 
-        @tmp_stdout = @tmp_stderr = nil
-
-        result_for(output, 0)
+        if status.success?
+          result_for(stdout_str, 0)
+        else
+          result_for(stderr_str, status)
+        end
       else
         result_for("#{current_token}: command not found\n", 2)
       end
