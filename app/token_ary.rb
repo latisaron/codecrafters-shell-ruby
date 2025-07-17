@@ -204,9 +204,9 @@ private
         execution_string +=
           if @tmp_stdout
             if @tmp_stdout[1] == 'w'
-              " 1> #{@tmp_stdout}"
+              " 1> #{@tmp_stdout[0]}"
             else
-              " 1>> #{@tmp_stdout}"
+              " 1>> #{@tmp_stdout[0]}"
             end
           else
             ''
@@ -215,9 +215,9 @@ private
         execution_string +=
           if @tmp_stderr
             if @tmp_stderr[1] == 'w'
-              " 2> #{@tmp_stderr}"
+              " 2> #{@tmp_stderr[0]}"
             else
-              " 2>> #{@tmp_stderr}"
+              " 2>> #{@tmp_stderr[0]}"
             end
           else
             ''
