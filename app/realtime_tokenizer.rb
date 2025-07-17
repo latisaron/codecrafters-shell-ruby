@@ -1,5 +1,6 @@
 # require 'pry'
 require './app/token.rb'
+require 'io/console'
 
 class RealtimeTokenizer
   def initialize
