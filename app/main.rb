@@ -7,7 +7,11 @@ require './app/token_ary.rb'
 require './app/tokenizer.rb'
 
 def ensure_space_at_final(string)
-  "#{string}\n" if string[-1] != "\n"
+  if string[-1] != "\n" && !string.empty?
+    "#{string}\n"
+  else
+    string
+  end
 end
 
 def output_results_list(results_list)
@@ -20,6 +24,7 @@ def output_results_list(results_list)
       $stdout.reopen(item[2], 'w') unless item[2].nil?
       $stderr.reopen(item[3], 'w') unless item[3].nil?
 
+      # binding.pry
       if item[1] == 0
         $stdout
       else
