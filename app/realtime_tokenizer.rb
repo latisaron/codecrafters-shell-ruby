@@ -26,9 +26,11 @@ class RealtimeTokenizer
           autocompleted_token = builtin_trie_for_usage.autocomplete(@current_token).first
           initial_token = @current_token
           @current_token = autocompleted_token
-  
-          print(@current_token[initial_token.size..])
-          @input << @current_token[initial_token.size..]
+
+          output = "#{@current_token[initial_token.size..]} "
+          print(output)
+          @input << output
+          add_token_and_reset(work_tokens_ary)
         elsif current_character == '\\'
           @input << current_character
           print(current_character)
