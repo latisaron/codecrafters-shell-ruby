@@ -42,20 +42,40 @@ class TokenAry
 
 private
 
-  def set_stdout_redirection_if_applicable
-    if index = @list.find_index(&:is_stdout_redirect?)
+  def set_stdout_redirect_write_if_applicable
+    if index = @list.find_index(&:is_stdout_redirect_write?)
       if redirect_target = @list[index+1]
-        @tmp_stdout = redirect_target.value
+        @tmp_stdout = [redirect_target.value, 'w']
         @list.delete_at(index+1)
         @list.delete_at(index)
       end
     end
   end
 
-  def set_stderr_redirection_if_applicable
-    if index = @list.find_index(&:is_stderr_redirect?)
+  def set_stderr_redirect_write_if_applicable
+    if index = @list.find_index(&:is_stderr_redirect_write?)
       if redirect_target = @list[index+1]
-        @tmp_stderr = redirect_target.value
+        @tmp_stderr = [redirect_target.value, 'w']
+        @list.delete_at(index+1)
+        @list.delete_at(index)
+      end
+    end
+  end
+
+  def set_stdout_redirect_append_if_applicable
+    if index = @list.find_index(&:is_stdout_redirect_append?)
+      if redirect_target = @list[index+1]
+        @tmp_stdout = [redirect_target.value, 'a']
+        @list.delete_at(index+1)
+        @list.delete_at(index)
+      end
+    end
+  end
+
+  def set_stderr_redirect_append_if_applicable
+    if index = @list.find_index(&:is_stderr_redirect_append?)
+      if redirect_target = @list[index+1]
+        @tmp_stderr = [redirect_target.value, 'a']
         @list.delete_at(index+1)
         @list.delete_at(index)
       end
@@ -63,8 +83,10 @@ private
   end
 
   def run_based_on_command_token(command_token)
-    set_stdout_redirection_if_applicable
-    set_stderr_redirection_if_applicable
+    set_stdout_redirect_write_if_applicable
+    set_stderr_redirect_write_if_applicable
+    set_stdout_redirect_append_if_applicable
+    set_stderr_redirect_append_if_applicable
 
     case command_token.value
     when 'exit'
@@ -177,10 +199,29 @@ private
 
     result =
       if path_included(token_without_quotes)
-        # binding.pry
         execution_string = "#{current_token} #{@list[1..].map(&:value).join(' ')}"
-        execution_string += " 1> #{@tmp_stdout}" if @tmp_stdout
-        execution_string += " 2> #{@tmp_stderr}" if @tmp_stderr
+        
+        execution_string +=
+          if @tmp_stdout
+            if @tmp_stdout[1] == 'w'
+              " 1> #{@tmp_stdout}"
+            else
+              " 1>> #{@tmp_stdout}"
+            end
+          else
+            ''
+          end
+
+        execution_string +=
+          if @tmp_stderr
+            if @tmp_stderr[1] == 'w'
+              " 2> #{@tmp_stderr}"
+            else
+              " 2>> #{@tmp_stderr}"
+            end
+          else
+            ''
+          end
         
         output = `#{execution_string}`
 

@@ -21,8 +21,8 @@ def output_results_list(results_list)
     if item[0].is_a?(Array)
       output_results_list(results_list)
     else
-      $stdout.reopen(item[2], 'w') unless item[2].nil?
-      $stderr.reopen(item[3], 'w') unless item[3].nil?
+      $stdout.reopen(item[2][0], item[2][1]) unless item[2].nil?
+      $stderr.reopen(item[3][0], item[3][1]) unless item[3].nil?
 
       # binding.pry
       if item[1] == 0
@@ -32,7 +32,7 @@ def output_results_list(results_list)
       end.write(ensure_space_at_final(item[0]))
 
       $stdout.reopen(original_stdout) unless item[2].nil?
-      $stderr.reopen(original_stderr) unless item[2].nil?
+      $stderr.reopen(original_stderr) unless item[3].nil?
     end
   end
 end

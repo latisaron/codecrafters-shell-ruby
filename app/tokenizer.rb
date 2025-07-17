@@ -81,9 +81,13 @@ private
     elsif current_token == ' '
       Token::BLANK_SPACE
     elsif current_token == '>' || current_token == '1>'
-      Token::STDOUT_REDIRECT
+      Token::STDOUT_REDIRECT_WRITE
     elsif current_token == '2>'
-      Token::STDERR_REDIRECT
+      Token::STDERR_REDIRECT_WRITE
+    elsif current_token == '>>' || current_token == '1>>'
+      Token::STDOUT_REDIRECT_APPEND
+    elsif current_token == '2>>'
+      Token::STDERR_REDIRECT_APPEND
     else
       word_or_command_based_on_size(token_ary)
     end

@@ -17,11 +17,17 @@ class Token
   STRINGIFIED_COMMAND = 5
   public_constant :STRINGIFIED_COMMAND
 
-  STDOUT_REDIRECT = 6
-  public_constant :STDOUT_REDIRECT
+  STDOUT_REDIRECT_WRITE = 6
+  public_constant :STDOUT_REDIRECT_WRITE
 
-  STDERR_REDIRECT = 7
-  public_constant :STDERR_REDIRECT
+  STDERR_REDIRECT_WRITE = 7
+  public_constant :STDERR_REDIRECT_WRITE
+
+  STDOUT_REDIRECT_APPEND = 8
+  public_constant :STDOUT_REDIRECT_APPEND
+
+  STDERR_REDIRECT_APPEND = 9
+  public_constant :STDERR_REDIRECT_APPEND
 
   ALLOWED_TYPES = [
     WORD,
@@ -30,8 +36,10 @@ class Token
     EMPTY_STRING,
     BLANK_SPACE,
     STRINGIFIED_COMMAND,
-    STDOUT_REDIRECT,
-    STDERR_REDIRECT,
+    STDOUT_REDIRECT_WRITE,
+    STDERR_REDIRECT_WRITE,
+    STDOUT_REDIRECT_APPEND,
+    STDERR_REDIRECT_APPEND,
   ]
   private_constant :ALLOWED_TYPES
 
@@ -69,11 +77,19 @@ class Token
     @type == STRINGIFIED_COMMAND
   end
 
-  def is_stdout_redirect?
-    @type == STDOUT_REDIRECT
+  def is_stdout_redirect_write?
+    @type == STDOUT_REDIRECT_WRITE
   end
 
-  def is_stderr_redirect?
-    @type == STDERR_REDIRECT
+  def is_stderr_redirect_write?
+    @type == STDERR_REDIRECT_WRITE
+  end
+
+  def is_stdout_redirect_append?
+    @type == STDOUT_REDIRECT_APPEND
+  end
+
+  def is_stderr_redirect_append?
+    @type == STDERR_REDIRECT_APPEND
   end
 end
